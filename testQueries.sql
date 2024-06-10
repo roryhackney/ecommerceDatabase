@@ -17,6 +17,8 @@ WHERE SKU_ID = 1;
 DELETE FROM INVENTORY
 WHERE SKU_ID = 3;
 
+
+
 -- Once Ken creates the CustomerTransaction table, we can:
 -- Get a list of the most popular products for a given time range
 -- Get a list of the least popular products for a given time range

@@ -1,7 +1,7 @@
 USE DRAGONS_HOARD_SHOP;
 
 INSERT INTO TAG VALUES
-	("Expensive"),
+    ("Expensive"),
     ("Cheap"),
     ("Shiny"),
     ("Smooth"),
@@ -16,8 +16,8 @@ INSERT INTO TAG VALUES
     ("Hate");
 
 INSERT INTO CRYSTAL (ID, Name, Description, IsSynthetic, SourceName, SupplierName) VALUES
-	(1, "Amber", "A yellow to brown stone formed from fossilized tree sap or resin, representing healing and prosperity.", false, "Samland Peninsula", "Alice's Amber"),
-	(2, "Chrysanthemum Stone", "A black and white rock with beautiful flower patterns. Represents luck and achieving one's purpose.", false, "Japan", "Cool Rock Imports"),
+    (1, "Amber", "A yellow to brown stone formed from fossilized tree sap or resin, representing healing and prosperity.", false, "Samland Peninsula", "Alice's Amber"),
+    (2, "Chrysanthemum Stone", "A black and white rock with beautiful flower patterns. Represents luck and achieving one's purpose.", false, "Japan", "Cool Rock Imports"),
     (3, "Rainbow Garnet", "A red and green gem from Africa which represents happiness and healing of the inner child.", false, "Africa", "Cool Rock Imports"),
     (4, "Black Jade", "A hard black stone that is said to grant protection and assist in spiritual journeys.", false, "Australia", "Cool Rock Imports"),
     (5, "Petrified Wood", "Wood that has fossilized, replacing plant matter with minerals. Represents steady growth and the past.", false, "Arizona, USA", "Bob's Rocks"),
@@ -27,14 +27,56 @@ INSERT INTO CRYSTAL (ID, Name, Description, IsSynthetic, SourceName, SupplierNam
     (9, "Turqoise", "A light blue stone, popular in jewelry, that represents emotional peace, healing, and forgiveness.", false, "Mexico", "Cool Rock Imports"),
     (10, "Quartz", "A transparent white crystal that represents healing, memory, and cleansing.", true, "Arkansas, USA", "Bob's Cool Rocks");
 
--- placeholder data until Ken completes the other half
-INSERT INTO ADDRESS VALUES (1), (2), (3), (4), (5), (6), (7), (8), (9), (10), (11), (12), (13), (14), (15);
-INSERT INTO PRODUCT VALUES (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10);
-INSERT INTO WAREHOUSE VALUES ("W1", 1), ("W2", 2), ("W3", 3), ("W4", 4), ("W5", 5), ("W6", 6), ("W7", 7), ("W8", 8), ("W9", 9), ("W10", 10);
+INSERT INTO STATE (StateCode, CountryCode, StateName) VALUES
+    ('CA', 'US', 'California'),
+    ('TX', 'US', 'Texas'),
+    ('NY', 'US', 'New York'),
+    ('FL', 'US', 'Florida'),
+    ('IL', 'US', 'Illinois'),
+    ('PA', 'US', 'Pennsylvania'),
+    ('OH', 'US', 'Ohio'),
+    ('MI', 'US', 'Michigan'),
+    ('GA', 'US', 'Georgia'),
+    ('NC', 'US', 'North Carolina');
 
--- back to my data
+INSERT INTO ADDRESS (StateCode, AddressName, CityName, ZipID, CountryCode) VALUES
+    ('CA', '123 Main St', 'Los Angeles', '90001', 'US'),
+    ('TX', '456 Oak St', 'Houston', '77001', 'US'),
+    ('NY', '789 Pine St', 'New York', '10001', 'US'),
+    ('FL', '101 Maple St', 'Miami', '33101', 'US'),
+    ('IL', '202 Birch St', 'Chicago', '60601', 'US'),
+    ('PA', '303 Cedar St', 'Philadelphia', '19101', 'US'),
+    ('OH', '404 Elm St', 'Columbus', '43201', 'US'),
+    ('MI', '505 Spruce St', 'Detroit', '48201', 'US'),
+    ('GA', '606 Walnut St', 'Atlanta', '30301', 'US'),
+    ('NC', '707 Hickory St', 'Charlotte', '28201', 'US');
+
+INSERT INTO WAREHOUSE (WarehouseName, AddressID) VALUES
+    ('Warehouse A', 1),
+    ('Warehouse B', 2),
+    ('Warehouse C', 3),
+    ('Warehouse D', 4),
+    ('Warehouse E', 5),
+    ('Warehouse F', 6),
+    ('Warehouse G', 7),
+    ('Warehouse H', 8),
+    ('Warehouse I', 9),
+    ('Warehouse J', 10);
+
+INSERT INTO PRODUCT (SKU_ID, CrystalID, Name, Description, Price, WidthSize, HeightSize, Weight, PackCount) VALUES
+    (1, 1, 'Product 1', 'Description 1', 10.00, 5.00, 5.00, 1.00, 10),
+    (2, 2, 'Product 2', 'Description 2', 20.00, 10.00, 5.00, 2.00, 20),
+    (3, 3, 'Product 3', 'Description 3', 30.00, 15.00, 5.00, 3.00, 30),
+    (4, 4, 'Product 4', 'Description 4', 40.00, 20.00, 5.00, 4.00, 40),
+    (5, 5, 'Product 5', 'Description 5', 50.00, 25.00, 5.00, 5.00, 50),
+    (6, 6, 'Product 6', 'Description 6', 60.00, 30.00, 5.00, 6.00, 60),
+    (7, 7, 'Product 7', 'Description 7', 70.00, 35.00, 5.00, 7.00, 70),
+    (8, 8, 'Product 8', 'Description 8', 80.00, 40.00, 5.00, 8.00, 80),
+    (9, 9, 'Product 9', 'Description 9', 90.00, 45.00, 5.00, 9.00, 90),
+    (10, 10, 'Product 10', 'Description 10', 100.00, 50.00, 5.00, 10.00, 100);
+
 INSERT INTO COLOR VALUES
-	("White", "#ffffff"),
+    ("White", "#ffffff"),
     ("Black", "#000000"),
     ("Red", "#F6766D"),
     ("Orange", "#FFAE16"),
@@ -46,9 +88,9 @@ INSERT INTO COLOR VALUES
     ("Gray", "#9E9E9E"),
     ("Brown", "#a36546"),
     ("Clear", "#eeeeee");
-    
+
 INSERT INTO CRYSTAL_COLOR (CrystalID, ColorName) VALUES
-	(10, "Clear"),
+    (10, "Clear"),
     (1, "Brown"),
     (1, "Yellow"),
     (2, "White"),
@@ -64,7 +106,7 @@ INSERT INTO CRYSTAL_COLOR (CrystalID, ColorName) VALUES
     (9, "Blue");
 
 INSERT INTO PROPERTY VALUES
-	("Prosperity"),
+    ("Prosperity"),
     ("Luck"),
     ("Healing"),
     ("Protection"),
@@ -75,9 +117,9 @@ INSERT INTO PROPERTY VALUES
     ("Spirituality"),
     ("Leadership"),
     ("Forgiveness");
-    
+
 INSERT INTO CRYSTAL_PROPERTY VALUES
-	("Healing", 1),
+    ("Healing", 1),
     ("Prosperity", 1),
     ("Luck", 2),
     ("Happiness", 3),
@@ -90,21 +132,21 @@ INSERT INTO CRYSTAL_PROPERTY VALUES
     ("Healing", 9),
     ("Forgiveness", 9),
     ("Healing", 10);
-    
-INSERT INTO CUSTOMER (FirstName, LastName, EmailURL, 			PhoneNumber, AddressID, CardNumber, CardType) VALUES 
-	("Timmy",		"Jimmy",	"tj@yahoo.com", 				null, 		11, null, null),
-	("Alice",		"Axwielder", "aaaaaaa@gmail.com", 			null, 		12, "**********1234", "Mastercard"),
-	("Penelope",	"Petunia", 	"normalhuman@gmail.com", 		"1234567890", 13, null, null),
-	("Bob", 		"Jones", 	"bob_jones27@gmail.com", 		"2345678901", 14, "************7382", null),
-	("Tammy", 		"Jammy", 	"tj@gmail.com", 				"3456789012", 15, null, null),
-	("Amanda", 		"", 		"amanda@amanda.com", 			null, 		11, null, null),
-	("Richard", 	"the Crab",	"courageousecrustacean@yahoo.com", null, 	12, null, "Visa"),
-	("Killing", 	"Time", 	"i_love_murder@gmail.com", 		null, 		13, null, null),
-	("Bartholomew",	"Baggins", 	"bb@yahoo.com", 				"9789012345", 14, null, null),
-	("Roxie",		"Hart", 	"rocks@gmail.com", 				"0000000000", 15, null, null);
-    
+
+INSERT INTO CUSTOMER (FirstName, LastName, EmailURL, PhoneNumber, AddressID, CardNumber, CardType) VALUES 
+    ("Timmy", "Jimmy", "tj@yahoo.com", null, 11, null, null),
+    ("Alice", "Axwielder", "aaaaaaa@gmail.com", null, 12, "**********1234", "Mastercard"),
+    ("Penelope", "Petunia", "normalhuman@gmail.com", "1234567890", 13, null, null),
+    ("Bob", "Jones", "bob_jones27@gmail.com", "2345678901", 14, "************7382", null),
+    ("Tammy", "Jammy", "tj@gmail.com", "3456789012", 15, null, null),
+    ("Amanda", "", "amanda@amanda.com", null, 11, null, null),
+    ("Richard", "the Crab", "courageousecrustacean@yahoo.com", null, 12, null, "Visa"),
+    ("Killing", "Time", "i_love_murder@gmail.com", null, 13, null, null),
+    ("Bartholomew", "Baggins", "bb@yahoo.com", "9789012345", 14, null, null),
+    ("Roxie", "Hart", "rocks@gmail.com", "0000000000", 15, null, null);
+
 INSERT INTO REWARDS_MEMBER (CustomerID, UserName, UserPassword, IsSubscribed) VALUES
-	(1, "timmyjimmy", "T@mdi9fA", true),
+    (1, "timmyjimmy", "T@mdi9fA", true),
     (2, "aaaaaaaaaaa", "aaaAAA!9", true),
     (3, "peepee", "Petun1a!", false),
     (4, "BobJones", "Password!1", true),
@@ -114,21 +156,21 @@ INSERT INTO REWARDS_MEMBER (CustomerID, UserName, UserPassword, IsSubscribed) VA
     (8, "killinIt", "Knjias!7", false),
     (9, "bb", "B&pasw0rd", false),
     (10, "rxhrt", "R0xieHr+", true);
-    
+
 INSERT INTO REVIEW (SKU_ID, RatingNumber, TitleName, Description) VALUES
-	(1, 5, "Great product!", "Perfect for my grandkids who love shiny rocks"),
-	(2, 3, "Okay, not very shiny", "Needs a good polish, otherwise good"),
-	(3, 4, "Great rock for the price!", "Added to my collection :)"),
-	(4, 2, "Purchased 'Discounted, Extremely Broken Rock' and it was broken!", "I demand a refund for this no returns no exchanges broken discontinued item"),
-	(5, 5, "Beautiful rock!", "Can't believe it was being sold for such a great price! Ordering more!"),
-	(6, 4, "Nice and textured, good fidgeting rock", null),
-	(7, 4, null, null),
-	(8, 3, null, null),
-	(9, 4, null, "cool rock thanks"),
+    (1, 5, "Great product!", "Perfect for my grandkids who love shiny rocks"),
+    (2, 3, "Okay, not very shiny", "Needs a good polish, otherwise good"),
+    (3, 4, "Great rock for the price!", "Added to my collection :)"),
+    (4, 2, "Purchased 'Discounted, Extremely Broken Rock' and it was broken!", "I demand a refund for this no returns no exchanges broken discontinued item"),
+    (5, 5, "Beautiful rock!", "Can't believe it was being sold for such a great price! Ordering more!"),
+    (6, 4, "Nice and textured, good fidgeting rock", null),
+    (7, 4, null, null),
+    (8, 3, null, null),
+    (9, 4, null, "cool rock thanks"),
     (2, 1, "Shattered upon dropping from the roof", null);
-    
+
 INSERT INTO REVIEW_TAGS (ReviewID, TagName) VALUES
-	(1, "Shiny"),
+    (1, "Shiny"),
     (1, "Great Gift"),
     (1, "Love"),
     (2, "Dislike"),
@@ -138,33 +180,33 @@ INSERT INTO REVIEW_TAGS (ReviewID, TagName) VALUES
     (5, "Cheap"),
     (6, "High Quality"),
     (10, "Expensive");
-    
+
 INSERT INTO INVENTORY VALUES
-	(1, "W3", 32),
-    (2, "W3", 15),
-    (3, "W1", 9),
-    (4, "W5", 64),
-    (5, "W1", 12),
-    (6, "W8", 200),
-    (7, "W6", 0),
-    (8, "W8", 2),
-    (9, "W9", 99),
-    (10, "W2", 76);
-    
+    (1, "Warehouse A", 32),
+    (2, "Warehouse A", 15),
+    (3, "Warehouse C", 9),
+    (4, "Warehouse E", 64),
+    (5, "Warehouse C", 12),
+    (6, "Warehouse H", 200),
+    (7, "Warehouse F", 0),
+    (8, "Warehouse H", 2),
+    (9, "Warehouse I", 99),
+    (10, "Warehouse B", 76);
+
 INSERT INTO WAREHOUSE_ORDER (OrderDate, WarehouseName, ExpectDelivDate, DeliveryDate) VALUES
-	('2021-01-01', "W1", '2021-01-10', '2021-01-11'),
-	('2021-06-11', "W9", '2021-06-12', '2021-07-23'),
-	('2022-05-07', "W8", '2022-05-12', '2022-05-12'),
-	('2022-09-30', "W6", '2022-10-05', '2022-10-04'),
-	('2023-01-01', "W5", '2023-01-02', '2023-01-12'),
-	('2023-06-09', "W1", '2023-06-15', '2023-06-17'),
-	('2023-08-30', "W4", '2023-09-03', '2023-09-03'),
-	('2023-10-14', "W1", '2023-10-17', '2023-10-17'),
-	('2024-05-01', "W3", '2024-05-15', '2024-05-15'),
-	('2024-06-01', "W2", '2024-06-15', null);
-    
+    ('2021-01-01', "Warehouse A", '2021-01-10', '2021-01-11'),
+    ('2021-06-11', "Warehouse I", '2021-06-12', '2021-07-23'),
+    ('2022-05-07', "Warehouse H", '2022-05-12', '2022-05-12'),
+    ('2022-09-30', "Warehouse F", '2022-10-05', '2022-10-04'),
+    ('2023-01-01', "Warehouse E", '2023-01-02', '2023-01-12'),
+    ('2023-06-09', "Warehouse A", '2023-06-15', '2023-06-17'),
+    ('2023-08-30', "Warehouse D", '2023-09-03', '2023-09-03'),
+    ('2023-10-14', "Warehouse A", '2023-10-17', '2023-10-17'),
+    ('2024-05-01', "Warehouse C", '2024-05-15', '2024-05-15'),
+    ('2024-06-01', "Warehouse B", '2024-06-15', null);
+
 INSERT INTO ORDERED_PRODUCT (OrderID, SKU_ID, UnitPrice) VALUES
-	(1, 1, 10.99),
+    (1, 1, 10.99),
     (1, 2, 5.99),
     (1, 3, 19.99),
     (2, 1, 10.49),
