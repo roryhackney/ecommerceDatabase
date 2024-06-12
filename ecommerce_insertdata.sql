@@ -37,7 +37,8 @@ INSERT INTO STATE (StateCode, CountryCode, StateName) VALUES
     ('OH', 'US', 'Ohio'),
     ('MI', 'US', 'Michigan'),
     ('GA', 'US', 'Georgia'),
-    ('NC', 'US', 'North Carolina');
+    ('NC', 'US', 'North Carolina'),
+    ('WA', 'US', 'Washington');
 
 INSERT INTO ADDRESS (StateCode, AddressName, CityName, ZipID, CountryCode) VALUES
     ('CA', '123 Main St', 'Los Angeles', '90001', 'US'),
@@ -49,7 +50,12 @@ INSERT INTO ADDRESS (StateCode, AddressName, CityName, ZipID, CountryCode) VALUE
     ('OH', '404 Elm St', 'Columbus', '43201', 'US'),
     ('MI', '505 Spruce St', 'Detroit', '48201', 'US'),
     ('GA', '606 Walnut St', 'Atlanta', '30301', 'US'),
-    ('NC', '707 Hickory St', 'Charlotte', '28201', 'US');
+    ('NC', '707 Hickory St', 'Charlotte', '28201', 'US'),
+    ('CA', '3851 Acacia Ave', 'Victorville', '92392', 'US'),
+    ('WA', '81246 Birch Way', 'Lynnwood', '98036', 'US'),
+    ('WA', '4121 Interlake Ave', 'Seattle', '98103', 'US'),
+    ('CA', '917 Bamboo St', 'La Puente', '91744', 'US'),
+    ('WA', '666 Cherry St', 'Seattle', '98104', 'US');
 
 INSERT INTO WAREHOUSE (WarehouseName, AddressID) VALUES
     ('Warehouse A', 1),
