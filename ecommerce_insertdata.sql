@@ -63,6 +63,7 @@ INSERT INTO WAREHOUSE (WarehouseName, AddressID) VALUES
     ('Warehouse I', 9),
     ('Warehouse J', 10);
 
+-- TODO: insert real product names and descriptions?
 INSERT INTO PRODUCT (SKU_ID, CrystalID, Name, Description, Price, WidthSize, HeightSize, Weight, PackCount) VALUES
     (1, 1, 'Product 1', 'Description 1', 10.00, 5.00, 5.00, 1.00, 10),
     (2, 2, 'Product 2', 'Description 2', 20.00, 10.00, 5.00, 2.00, 20),
