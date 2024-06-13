@@ -30,12 +30,13 @@ DELIMITER //
 
 CREATE PROCEDURE ModifyInventoryAmount(
     IN p_SKU_ID INT UNSIGNED,
-    IN p_Count INT
+    IN p_Count INT,
+    IN p_WarehouseName VARCHAR(50)
 )
 BEGIN
     UPDATE INVENTORY
     SET Count = p_Count
-    WHERE SKU_ID = p_SKU_ID;
+    WHERE SKU_ID = p_SKU_ID AND WarehouseName = p_WarehouseName;
 END //
 
 DELIMITER ;
