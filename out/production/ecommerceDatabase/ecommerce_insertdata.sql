@@ -140,7 +140,7 @@ INSERT INTO CRYSTAL_PROPERTY VALUES
     ("Forgiveness", 9),
     ("Healing", 10);
 
-INSERT INTO CUSTOMER (FirstName, LastName, EmailURL, PhoneNumber, AddressID, CardNumber, CardType) VALUES 
+INSERT INTO CUSTOMER (FirstName, LastName, EmailURL, PhoneNumber, AddressID, CardNumber, CardType) VALUES
     ("Timmy", "Jimmy", "tj@yahoo.com", null, 11, null, null),
     ("Alice", "Axwielder", "aaaaaaa@gmail.com", null, 12, "**********1234", "Mastercard"),
     ("Penelope", "Petunia", "normalhuman@gmail.com", "1234567890", 13, null, null),
@@ -223,3 +223,29 @@ INSERT INTO ORDERED_PRODUCT (OrderID, SKU_ID, UnitPrice) VALUES
     (7, 9, 18.75),
     (4, 9, 17.99),
     (9, 4, 9.75);
+
+INSERT INTO TRANSACTION (CustomerID, ShippingAddress, OrderDate, ShipDate, DeliverDate, SubtotalPrice, TaxPrice, TotalPrice) VALUES
+    (1, 11, '2023-01-01', '2023-01-03', '2023-01-05', 100.00, 10.00, 110.00),
+    (2, 12, '2023-02-01', '2023-02-03', '2023-02-05', 200.00, 20.00, 220.00),
+    (3, 13, '2023-03-01', '2023-03-03', '2023-03-05', 300.00, 30.00, 330.00),
+    (4, 14, '2023-04-01', '2023-04-03', '2023-04-05', 400.00, 40.00, 440.00),
+    (5, 15, '2023-05-01', '2023-05-03', '2023-05-05', 500.00, 50.00, 550.00);
+
+INSERT INTO PRODUCT_TRANSACTION (SKU_ID, TransID, Quantity, UnitPrice) VALUES
+    (1, 1, 5, 10.00),
+    (2, 1, 3, 20.00),
+    (3, 2, 2, 30.00),
+    (4, 3, 1, 40.00),
+    (5, 4, 4, 50.00),
+    (6, 5, 5, 60.00),
+    (7, 5, 6, 70.00),
+    (8, 4, 7, 80.00),
+    (9, 3, 8, 90.00),
+    (10, 2, 9, 100.00);
+
+INSERT INTO PRODUCT_ORDER (ProductID, WarehouseName, OrderDate, ExpectedDeliveryDate, DeliveryDate, TotalPrice) VALUES
+    (1, 'Warehouse A', '2023-03-01', '2023-03-05', '2023-03-06', 100.00),
+    (2, 'Warehouse B', '2023-04-01', '2023-04-05', '2023-04-06', 200.00),
+    (3, 'Warehouse C', '2023-05-01', '2023-05-05', '2023-05-06', 300.00),
+    (4, 'Warehouse D', '2023-06-01', '2023-06-05', '2023-06-06', 400.00),
+    (5, 'Warehouse E', '2023-07-01', '2023-07-05', '2023-07-06', 500.00);
