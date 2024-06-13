@@ -35,7 +35,7 @@ public class Main {
                     break;
                 case 2:
                     System.out.println("You selected: Add New Product");
-                    addProduct(scan);
+                    addProduct(scan, conn);
             }
             displayMenu();
             choice = getChoice(scan, 1, 8);
@@ -100,11 +100,47 @@ public class Main {
         return result.toString();
     }
 
-    public static void addProduct(Scanner scan) {
-        //print crystal names and ids
-        System.out.println("Which crystal is this product made with?");
-        int crystalId = -1;
-        //if the number is not in the db, try again
+    public static void addProduct(Scanner scan, Connection conn) {
+        String displayCrystals = "SELECT ID, Name FROM CRYSTAL ORDER BY ID";
+        int crystalId = 0;
+        String crystalName = "";
+        try {
+            //print crystal names and ids
+            Statement statement = conn.createStatement();
+            ResultSet results = statement.executeQuery(displayCrystals);
+            System.out.println("ID\tName");
+            boolean hasNext = results.next();
+            int min = results.getInt("ID");
+            int max = 0;
+            while (hasNext) {
+                max = results.getInt("ID");
+                System.out.print(max + "\t");
+                System.out.println(results.getString("Name"));
+                hasNext = results.next();
+            }
+
+            //get valid id that is in the database
+            boolean validId = false;
+            System.out.println("Which crystal is this product made with?");
+            while (! validId) {
+                //validate chosen id
+                crystalId = getChoice(scan, min, max);
+                //if the number is not in the db, try again
+                String checkID = "SELECT Name FROM CRYSTAL WHERE ID = " + crystalId;
+                results = statement.executeQuery(checkID);
+                validId = results.next();
+                if (! validId) {
+                    System.out.println("ID not found in database. Please try again.");
+                } else {
+                    crystalName = results.getString("Name");
+                }
+            }
+            statement.close();
+        } catch (SQLException e) {
+            System.out.println("Database error. Please try again later. " + e.getMessage());
+            return;
+        }
+        System.out.println("You selected " + crystalName);
 
         System.out.println("What should this product be named?");
         String name = "";
@@ -128,6 +164,24 @@ public class Main {
         double weight = getDouble(scan, 0.01, 999.99);
         System.out.println("How many crystals in this product?");
         int count = getChoice(scan, 1, 999);
+
+        String insertQuery = String.format("INSERT INTO PRODUCT " +
+                "(CrystalID, Name, Description, Price, WidthSize, HeightSize, Weight, PackCount) " +
+                "VALUES (%d, %s,    %s,         %.2f,   %.2f,       %.2f,       %.2f,   %d);",
+                crystalId, name, description, price, width,      height,     weight, count);
+        System.out.println("Inserting: " + insertQuery);
+        try {
+            Statement statement = conn.createStatement();
+            int updatedRows = statement.executeUpdate(insertQuery);
+            if (updatedRows == 0) {
+                System.out.println("Unable to insert into database.");
+            } else {
+                System.out.println("Successfully inserted into database.");
+            }
+            statement.close();
+        } catch (SQLException e) {
+            System.out.println("Unable to insert into database. " + e.getMessage());
+        }
     }
 
     public static double getDouble(Scanner scan, double min, double max) {
