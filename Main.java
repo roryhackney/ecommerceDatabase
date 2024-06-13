@@ -29,10 +29,13 @@ public class Main {
         int choice = getChoice(scan, 1, 8);
         while (choice != 8) {
             switch (choice) {
-                case 1: {
+                case 1:
                     System.out.print(viewInventory(scan, conn));
                     System.out.println("Inventory complete.");
-                }
+                    break;
+                case 2:
+                    System.out.println("You selected: Add New Product");
+                    addProduct(scan);
             }
             displayMenu();
             choice = getChoice(scan, 1, 8);
@@ -95,5 +98,48 @@ public class Main {
             return "Database error.";
         }
         return result.toString();
+    }
+
+    public static void addProduct(Scanner scan) {
+        //print crystal names and ids
+        System.out.println("Which crystal is this product made with?");
+        int crystalId = -1;
+        //if the number is not in the db, try again
+
+        System.out.println("What should this product be named?");
+        String name = "";
+        while (name.isBlank()) {
+            name = scan.nextLine().strip();
+        }
+
+        System.out.println("Describe the product in detail.");
+        String description = "";
+        while (description.isBlank()) {
+            description = scan.nextLine().strip();
+        }
+
+        System.out.println("How much should this product cost?");
+        double price = getDouble(scan, 0.01, 999.99);
+        System.out.println("How wide is this product in inches?");
+        double width = getDouble(scan, 0.01, 999.99);
+        System.out.println("How tall is this product in inches?");
+        double height = getDouble(scan, 0.01, 999.99);
+        System.out.println("How heavy is this product in pounds?");
+        double weight = getDouble(scan, 0.01, 999.99);
+        System.out.println("How many crystals in this product?");
+        int count = getChoice(scan, 1, 999);
+    }
+
+    public static double getDouble(Scanner scan, double min, double max) {
+        System.out.printf("Enter a double %.2f-%.2f ", min, max);
+        Double choice = min - 1;
+        while (choice.compareTo(min) < 0 || choice.compareTo(max) > 0) {
+            while (!scan.hasNextDouble()) {
+                scan.nextLine();
+            }
+            choice = scan.nextDouble();
+            scan.nextLine();
+        }
+        return choice;
     }
 }

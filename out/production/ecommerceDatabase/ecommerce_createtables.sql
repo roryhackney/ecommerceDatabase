@@ -51,9 +51,15 @@ CREATE TABLE PRODUCT (
     WidthSize DECIMAL(5, 2) NOT NULL,
     HeightSize DECIMAL(5, 2) NOT NULL,
     Weight DECIMAL(5, 2) NOT NULL,
-    PackCount INT NOT NULL,
+    PackCount INT NOT NULL DEFAULT 1,
     CONSTRAINT ProductCrystalFK FOREIGN KEY (CrystalID) REFERENCES CRYSTAL(ID)
-    ON UPDATE CASCADE ON DELETE RESTRICT
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT ProductPriceOver0 CHECK (Price > 0),
+    CONSTRAINT ProductWidthOver0 CHECK (WidthSize > 0),
+    CONSTRAINT ProductHeightOver0 CHECK (HeightSize > 0),
+    CONSTRAINT ProductWeightOver0 CHECK (Weight > 0),
+    CONSTRAINT PackCountOver0 CHECK (PackCount > 0),
+    CONSTRAINT UniqueProduct UNIQUE (CrystalID, Name, Price, PackCount)
 );
 
 CREATE TABLE TRANSACTION (
