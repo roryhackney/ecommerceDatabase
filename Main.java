@@ -30,9 +30,11 @@ public class Main {
         while (choice != 8) {
             switch (choice) {
                 case 1: {
-                    viewInventory(scan, conn);
+                    System.out.print(viewInventory(scan, conn));
+                    System.out.println("Inventory complete.");
                 }
             }
+            displayMenu();
             choice = getChoice(scan, 1, 8);
         }
         System.out.println("Have a nice day.");
@@ -52,7 +54,7 @@ public class Main {
     }
 
     public static void displayMenu() {
-        System.out.println("Welcome to the Dragon's Hoard Management System.");
+        System.out.println("\nWelcome to the Dragon's Hoard Management System.");
         System.out.println("\t1. View inventory\n" +
                         "\t2. Add new product\n" +
                         "\t3. Update quantity of a product\n" +
@@ -65,26 +67,25 @@ public class Main {
 
     public static String viewInventory(Scanner scan, Connection conn) {
         System.out.println("You selected: View Inventory");
-        System.out.print("Enter Y to view by Warehouse or N for global quantities: ");
-        String choice = scan.nextLine().strip();
-
-        //write the query
-        String query;
-        if (choice.equals("Y")) {
-            query = "SELECT SKU_ID, Count, WarehouseName" +
-                    "FROM INVENTORY ORDER BY WarehouseName, Count";
-            query = "DESCRIBE INVENTORY";
-        } else {
-            query = "SELECT SKU_ID, Count";
-        }
-
+        String query = "SELECT Product.SKU_ID AS SKU, WarehouseName, Count, IsSynthetic " +
+                    ", Product.Name AS ProductName, Crystal.Name AS CrystalName " +
+                    "FROM INVENTORY " +
+                    "INNER JOIN PRODUCT ON INVENTORY.SKU_ID = PRODUCT.SKU_ID " +
+                    "INNER JOIN CRYSTAL ON PRODUCT.CrystalID = CRYSTAL.ID " +
+                    "ORDER BY WarehouseName, Count DESC";
+        StringBuilder result = new StringBuilder("Count\tWarehouse Name\tSKU\t\tProduct Name\tIs Synthetic\tCrystal Name\n");
         //execute the query
         try {
             Statement statement = conn.createStatement();
             ResultSet results = statement.executeQuery(query);
             boolean hasNext = results.next();
             while (hasNext) {
-                System.out.println(results.getString(1));
+                result.append(results.getString("Count")).append("\t\t");
+                result.append(results.getString("WarehouseName")).append("\t\t");
+                result.append(results.getString("SKU")).append("\t\t");
+                result.append(results.getString("ProductName")).append("\t\t");
+                result.append(results.getBoolean("IsSynthetic")).append("\t\t\t");
+                result.append(results.getString("CrystalName")).append("\n");
                 hasNext = results.next();
             }
             statement.close();
@@ -93,6 +94,6 @@ public class Main {
             System.out.println(e.getMessage());
             return "Database error.";
         }
-        return "";
+        return result.toString();
     }
 }
