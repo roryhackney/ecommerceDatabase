@@ -30,12 +30,18 @@ public class Main {
         while (choice != 8) {
             switch (choice) {
                 case 1:
+                    System.out.println("You selected: View Inventory");
                     System.out.print(viewInventory(scan, conn));
                     System.out.println("Inventory complete.");
                     break;
                 case 2:
                     System.out.println("You selected: Add New Product");
                     addProduct(scan, conn);
+                    break;
+                case 3:
+                    System.out.println("You selected: Update Quantity");
+                    updateQuantity(conn, scan);
+                    break;
             }
             displayMenu();
             choice = getChoice(scan, 1, 8);
@@ -69,7 +75,6 @@ public class Main {
     }
 
     public static String viewInventory(Scanner scan, Connection conn) {
-        System.out.println("You selected: View Inventory");
         String query = "SELECT Product.SKU_ID AS SKU, WarehouseName, Count, IsSynthetic " +
                     ", Product.Name AS ProductName, Crystal.Name AS CrystalName " +
                     "FROM INVENTORY " +
@@ -101,46 +106,7 @@ public class Main {
     }
 
     public static void addProduct(Scanner scan, Connection conn) {
-        String displayCrystals = "SELECT ID, Name FROM CRYSTAL ORDER BY ID";
-        int crystalId = 0;
-        String crystalName = "";
-        try {
-            //print crystal names and ids
-            Statement statement = conn.createStatement();
-            ResultSet results = statement.executeQuery(displayCrystals);
-            System.out.println("ID\tName");
-            boolean hasNext = results.next();
-            int min = results.getInt("ID");
-            int max = 0;
-            while (hasNext) {
-                max = results.getInt("ID");
-                System.out.print(max + "\t");
-                System.out.println(results.getString("Name"));
-                hasNext = results.next();
-            }
-
-            //get valid id that is in the database
-            boolean validId = false;
-            System.out.println("Which crystal is this product made with?");
-            while (! validId) {
-                //validate chosen id
-                crystalId = getChoice(scan, min, max);
-                //if the number is not in the db, try again
-                String checkID = "SELECT Name FROM CRYSTAL WHERE ID = " + crystalId;
-                results = statement.executeQuery(checkID);
-                validId = results.next();
-                if (! validId) {
-                    System.out.println("ID not found in database. Please try again.");
-                } else {
-                    crystalName = results.getString("Name");
-                }
-            }
-            statement.close();
-        } catch (SQLException e) {
-            System.out.println("Database error. Please try again later. " + e.getMessage());
-            return;
-        }
-        System.out.println("You selected " + crystalName);
+        int crystalId = getValidFK(conn, scan, "CRYSTAL", "ID", "Name");
 
         System.out.println("What should this product be named?");
         String name = "";
@@ -195,5 +161,119 @@ public class Main {
             scan.nextLine();
         }
         return choice;
+    }
+
+    public static void updateQuantity(Connection conn, Scanner scan) {
+        //print products and get id
+        int productFK = getValidFK(conn, scan, "PRODUCT", "SKU_ID", "Name");
+
+        //print warehouses and get warehouse
+        String warehouse = getValidWarehouse(conn, scan);
+
+        //if product not in warehouse, add to inventory table
+        String currQty = "SELECT Count FROM INVENTORY " +
+                         "WHERE SKU_ID = " + productFK +
+                        " AND WarehouseName = '" + warehouse + "';";
+        //if product in warehouse, update quantity
+        try {
+            Statement s = conn.createStatement();
+            ResultSet r = s.executeQuery(currQty);
+            int qty = 0;
+            if (r.next()) {
+                qty = r.getInt("Count");
+            }
+            System.out.println("There are currently " + qty + " of this product at " + warehouse);
+            System.out.println("What should the quantity be set to? ");
+            int quantity = getChoice(scan, 0, 999);
+            String query = "";
+            if (qty == 0) {
+                query = String.format("INSERT INTO INVENTORY (SKU_ID, WarehouseName, Count) "
+                        + "VALUES (%d, '%s', %d);", productFK, warehouse, quantity);
+            } else {
+                query = "UPDATE INVENTORY SET Count = " + quantity +
+                        " WHERE SKU_ID = " + productFK +
+                        " AND WarehouseName = '" + warehouse + "';";
+            }
+            int affectedRows = s.executeUpdate(query);
+            if (affectedRows > 0) {
+                System.out.println("Quantity successfully updated.");
+            } else {
+                System.out.println("Unable to update quantity. Please try again later.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
+    }
+
+    public static int getValidFK(Connection conn, Scanner scan, String table, String pk, String name) {
+        // print options
+        String query = String.format("SELECT %s, %s FROM %s ORDER BY %s", pk, name, table, pk);
+        try {
+            Statement s = conn.createStatement();
+            ResultSet res = s.executeQuery(query);
+            System.out.println(pk + "\t" + name);
+            int max = 0;
+            int min = 0;
+            boolean hasNext = res.next();
+            if (hasNext) min = res.getInt(pk);
+            while (hasNext) {
+                max = res.getInt(pk);
+                System.out.print(max + "\t");
+                System.out.println(res.getString(name));
+                hasNext = res.next();
+            }
+
+            //get valid fk
+            int fk = -1;
+            boolean validId = false;
+            System.out.println("Which " + table.toLowerCase() + " is this connected to?");
+            while (! validId) {
+                //validate chosen id
+                fk = getChoice(scan, min, max);
+                //if the number is not in the db, try again
+                String checkID = String.format("SELECT %s FROM %s WHERE %s = %d", name, table, pk, fk);
+                res = s.executeQuery(checkID);
+                validId = res.next();
+                if (! validId) {
+                    System.out.println("ID not found in database. Please try again.");
+                } else {
+                    System.out.println("You selected " + res.getString(name));
+                }
+            }
+            s.close();
+            return fk;
+        } catch (SQLException e) {
+            System.out.println("Could not connect to database: " + e.getMessage());
+        }
+        return -1;
+    }
+
+    public static String getValidWarehouse(Connection conn, Scanner scan) {
+        String query = "SELECT WarehouseName FROM WAREHOUSE";
+        try {
+            // print options
+            Statement s = conn.createStatement();
+            ResultSet res = s.executeQuery(query);
+            System.out.println("Warehouse Name");
+            while (res.next()) {
+                System.out.println(res.getString("WarehouseName"));
+            }
+
+            //get valid warehouse
+            System.out.println("Which warehouse would you like to select?");
+            String warehouse = scan.nextLine().strip();
+            String base = "SELECT * FROM WAREHOUSE WHERE WarehouseName = '";
+            String checkQuery = base + warehouse + "';";
+            res = s.executeQuery(checkQuery);
+            while (! res.next()) {
+                warehouse = scan.nextLine().strip();
+                checkQuery = base + warehouse + "';";
+                res = s.executeQuery(checkQuery);
+            }
+            return warehouse;
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
+        return "";
     }
 }
