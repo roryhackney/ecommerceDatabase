@@ -30,7 +30,6 @@ public class Main {
         while (choice != 8) {
             switch (choice) {
                 case 1:
-                    System.out.println("You selected: View Inventory");
                     System.out.print(viewInventory(scan, conn));
                     System.out.println("Inventory complete.");
                     break;
@@ -39,8 +38,27 @@ public class Main {
                     addProduct(scan, conn);
                     break;
                 case 3:
-                    System.out.println("You selected: Update Quantity");
-                    updateQuantity(conn, scan);
+                    System.out.println("You selected: Update Quantity of a Product");
+                    updateProductQuantity(scan, conn);
+                    break;
+                case 4:
+                    System.out.println("You selected: Delete Product");
+                    deleteProduct(scan, conn);
+                    break;
+                case 5:
+                    System.out.println("You selected: Get Most Popular Products During Date Range");
+                    // Implement this case as needed
+                    break;
+                case 6:
+                    System.out.println("You selected: Get Least Popular Products During Date Range");
+                    // Implement this case as needed
+                    break;
+                case 7:
+                    System.out.println("You selected: Get Users for Promo and Their Favorite Products");
+                    // Implement this case as needed
+                    break;
+                default:
+                    System.out.println("Invalid choice.");
                     break;
             }
             displayMenu();
@@ -48,6 +66,7 @@ public class Main {
         }
         System.out.println("Have a nice day.");
     }
+
     public static int getChoice(Scanner scan, int min, int max) {
         int choice = min - 1;
         System.out.print("What would you like to do? Enter a number " + min + "-" + max + ": ");
@@ -106,7 +125,9 @@ public class Main {
     }
 
     public static void addProduct(Scanner scan, Connection conn) {
-        int crystalId = getValidFK(conn, scan, "CRYSTAL", "ID", "Name");
+        // print crystal names and ids
+        System.out.println("Which crystal is this product made with?");
+        int crystalId = getChoice(scan, 1, 10); // assuming crystal IDs are from 1 to 10
 
         System.out.println("What should this product be named?");
         String name = "";
@@ -131,22 +152,62 @@ public class Main {
         System.out.println("How many crystals in this product?");
         int count = getChoice(scan, 1, 999);
 
-        String insertQuery = String.format("INSERT INTO PRODUCT " +
-                "(CrystalID, Name, Description, Price, WidthSize, HeightSize, Weight, PackCount) " +
-                "VALUES (%d, %s,    %s,         %.2f,   %.2f,       %.2f,       %.2f,   %d);",
-                crystalId, name, description, price, width,      height,     weight, count);
-        System.out.println("Inserting: " + insertQuery);
+        // call the stored procedure to add the new product
         try {
-            Statement statement = conn.createStatement();
-            int updatedRows = statement.executeUpdate(insertQuery);
-            if (updatedRows == 0) {
-                System.out.println("Unable to insert into database.");
-            } else {
-                System.out.println("Successfully inserted into database.");
-            }
-            statement.close();
+            CallableStatement stmt = conn.prepareCall("{CALL AddNewProduct(?, ?, ?, ?, ?, ?, ?, ?)}");
+            stmt.setInt(1, crystalId);
+            stmt.setString(2, name);
+            stmt.setString(3, description);
+            stmt.setDouble(4, price);
+            stmt.setDouble(5, width);
+            stmt.setDouble(6, height);
+            stmt.setDouble(7, weight);
+            stmt.setInt(8, count);
+            stmt.execute();
+            stmt.close();
+            System.out.println("Product added successfully.");
         } catch (SQLException e) {
-            System.out.println("Unable to insert into database. " + e.getMessage());
+            System.out.println("Database error. Please try again later.");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void updateProductQuantity(Scanner scan, Connection conn) {
+        System.out.println("Enter the SKU of the product you want to update:");
+        int sku = getChoice(scan, 1, 10); // assuming SKU IDs are from 1 to 10
+
+        System.out.println("Enter the new quantity:");
+        int newQuantity = getChoice(scan, 0, 999);
+
+        // call the stored procedure to update the inventory amount
+        try {
+            CallableStatement stmt = conn.prepareCall("{CALL ModifyInventoryAmount(?, ?)}");
+            stmt.setInt(1, sku);
+            stmt.setInt(2, newQuantity);
+            stmt.execute();
+            stmt.close();
+            System.out.println("Inventory updated successfully.");
+        } catch (SQLException e) {
+            System.out.println("Database error. Please try again later.");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void deleteProduct(Scanner scan, Connection conn) {
+        System.out.println("Enter the SKU of the product you want to delete:");
+        int sku = getChoice(scan, 1, 10); // assuming SKU IDs are from 1 to 10
+
+        String deleteQuery = "DELETE FROM PRODUCT WHERE SKU_ID = ?";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(deleteQuery);
+            stmt.setInt(1, sku);
+            stmt.executeUpdate();
+            stmt.close();
+            System.out.println("Product deleted successfully.");
+        } catch (SQLException e) {
+            System.out.println("Database error. Please try again later.");
+            System.out.println(e.getMessage());
         }
     }
 
