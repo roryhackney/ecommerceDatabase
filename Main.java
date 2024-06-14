@@ -7,7 +7,7 @@ public class Main {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection("jdbc:mysql://127.0.0.1/dragons_hoard_shop?"
-            + "user=root&password=Givsri7h");
+                    + "user=root&password=Givsri7h");
         } catch (SQLException e) {
             System.out.println("Could not connect to database, exiting:" + e.getMessage());
             return;
@@ -23,6 +23,7 @@ public class Main {
             System.out.println(e.getMessage());
         }
     }
+
     public static void runMenu(Connection conn) {
         displayMenu();
         Scanner scan = new Scanner(System.in);
@@ -72,7 +73,7 @@ public class Main {
         int choice = min - 1;
         System.out.print("What would you like to do? Enter a number " + min + "-" + max + ": ");
         while (choice < min || choice > max) {
-            while (! scan.hasNextInt()) {
+            while (!scan.hasNextInt()) {
                 scan.nextLine();
             }
             choice = scan.nextInt();
@@ -85,22 +86,22 @@ public class Main {
     public static void displayMenu() {
         System.out.println("\nWelcome to the Dragon's Hoard Management System.");
         System.out.println("\t1. View inventory\n" +
-                        "\t2. Add new product\n" +
-                        "\t3. Update quantity of a product\n" +
-                        "\t4. Delete / discontinue a product\n" +
-                        "\t5. Get most popular products during date range\n" +
-                        "\t6. Get least popular products during date range\n" +
-                        "\t7. Get users for promo and their favorite products\n\n" +
-                        "\t8. Quit");
+                "\t2. Add new product\n" +
+                "\t3. Update quantity of a product\n" +
+                "\t4. Delete / discontinue a product\n" +
+                "\t5. Get most popular products during date range\n" +
+                "\t6. Get least popular products during date range\n" +
+                "\t7. Get users for promo and their favorite products\n\n" +
+                "\t8. Quit");
     }
 
     public static String viewInventory(Scanner scan, Connection conn) {
         String query = "SELECT Product.SKU_ID AS SKU, WarehouseName, Count, IsSynthetic " +
-                    ", Product.Name AS ProductName, Crystal.Name AS CrystalName " +
-                    "FROM INVENTORY " +
-                    "INNER JOIN PRODUCT ON INVENTORY.SKU_ID = PRODUCT.SKU_ID " +
-                    "INNER JOIN CRYSTAL ON PRODUCT.CrystalID = CRYSTAL.ID " +
-                    "ORDER BY WarehouseName, Count DESC";
+                ", Product.Name AS ProductName, Crystal.Name AS CrystalName " +
+                "FROM INVENTORY " +
+                "INNER JOIN PRODUCT ON INVENTORY.SKU_ID = PRODUCT.SKU_ID " +
+                "INNER JOIN CRYSTAL ON PRODUCT.CrystalID = CRYSTAL.ID " +
+                "ORDER BY WarehouseName, Count DESC";
         StringBuilder result = new StringBuilder("Count\tWarehouse Name\tSKU\t\tProduct Name\tIs Synthetic\tCrystal Name\n");
         //execute the query
         try {
@@ -128,7 +129,7 @@ public class Main {
     public static void addProduct(Scanner scan, Connection conn) {
         // print crystal names and ids
         System.out.println("Which crystal is this product made with?");
-        int crystalId = getValidFK(conn, scan, "CRYSTAL", "ID", "Name"); // assuming crystal IDs are from 1 to 10
+        int crystalId = getValidFK(conn, scan, "CRYSTAL", "ID", "Name");
 
         System.out.println("What should this product be named?");
         String name = "";
@@ -176,28 +177,54 @@ public class Main {
     public static void updateProductQuantity(Scanner scan, Connection conn) {
         System.out.println("Enter the SKU of the product you want to update:");
         int sku = getValidFK(conn, scan, "PRODUCT", "SKU_ID", "Name");
+        System.out.println("Enter the warehouse where the product is located:");
         String warehouse = getValidWarehouse(conn, scan);
+
         System.out.println("Enter the new quantity:");
         int newQuantity = getChoice(scan, 0, 999);
 
-        // call the stored procedure to update the inventory amount
+        // Check if the product exists in the given warehouse
+        String checkQuery = "SELECT Count FROM INVENTORY WHERE SKU_ID = ? AND WarehouseName = ?";
+
         try {
-            CallableStatement stmt = conn.prepareCall("{CALL ModifyInventoryAmount(?, ?, ?)}");
-            stmt.setInt(1, sku);
-            stmt.setInt(2, newQuantity);
-            stmt.setString(3, warehouse);
-            stmt.execute();
-            stmt.close();
-            System.out.println("Inventory updated successfully.");
+            PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
+            checkStmt.setInt(1, sku);
+            checkStmt.setString(2, warehouse);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (rs.next()) {
+                // If the product exists in the warehouse, update the quantity
+                String updateQuery = "UPDATE INVENTORY SET Count = ? WHERE SKU_ID = ? AND WarehouseName = ?";
+                PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
+                updateStmt.setInt(1, newQuantity);
+                updateStmt.setInt(2, sku);
+                updateStmt.setString(3, warehouse);
+                updateStmt.executeUpdate();
+                updateStmt.close();
+                System.out.println("Inventory updated successfully.");
+            } else {
+                // If the product does not exist in the warehouse, insert a new record
+                String insertQuery = "INSERT INTO INVENTORY (SKU_ID, WarehouseName, Count) VALUES (?, ?, ?)";
+                PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
+                insertStmt.setInt(1, sku);
+                insertStmt.setString(2, warehouse);
+                insertStmt.setInt(3, newQuantity);
+                insertStmt.executeUpdate();
+                insertStmt.close();
+                System.out.println("Inventory record created and updated successfully.");
+            }
+
+            checkStmt.close();
         } catch (SQLException e) {
             System.out.println("Database error. Please try again later.");
             System.out.println(e.getMessage());
         }
     }
 
+
     public static void deleteProduct(Scanner scan, Connection conn) {
         System.out.println("Enter the SKU of the product you want to delete:");
-        int sku = getValidFK(conn, scan, "PRODUCT", "SKU_ID", "Name"); // assuming SKU IDs are from 1 to 10
+        int sku = getValidFK(conn, scan, "PRODUCT", "SKU_ID", "Name");
 
         String deleteQuery = "DELETE FROM PRODUCT WHERE SKU_ID = ?";
 
@@ -212,6 +239,104 @@ public class Main {
             System.out.println(e.getMessage());
         }
     }
+
+    public static void getMostPopularProducts(Scanner scan, Connection conn) {
+        System.out.println("Enter the start date (YYYY-MM-DD):");
+        String startDate = scan.nextLine();
+        System.out.println("Enter the end date (YYYY-MM-DD):");
+        String endDate = scan.nextLine();
+
+        String query = "SELECT p.Name, SUM(pt.Quantity) AS TotalSold " +
+                "FROM PRODUCT_TRANSACTION pt " +
+                "JOIN PRODUCT p ON pt.SKU_ID = p.SKU_ID " +
+                "JOIN `TRANSACTION` t ON pt.TransID = t.TransID " +
+                "WHERE t.OrderDate BETWEEN ? AND ? " +
+                "GROUP BY p.Name " +
+                "ORDER BY TotalSold DESC";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, startDate);
+            stmt.setString(2, endDate);
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("Most Popular Products:");
+            while (rs.next()) {
+                System.out.println(rs.getString("Name") + " - " + rs.getInt("TotalSold") + " sold");
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("Database error. Please try again later.");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void getLeastPopularProducts(Scanner scan, Connection conn) {
+        System.out.println("Enter the start date (YYYY-MM-DD):");
+        String startDate = scan.nextLine();
+        System.out.println("Enter the end date (YYYY-MM-DD):");
+        String endDate = scan.nextLine();
+
+        String query = "SELECT p.Name, SUM(pt.Quantity) AS TotalSold " +
+                "FROM PRODUCT_TRANSACTION pt " +
+                "JOIN PRODUCT p ON pt.SKU_ID = p.SKU_ID " +
+                "JOIN `TRANSACTION` t ON pt.TransID = t.TransID " +
+                "WHERE t.OrderDate BETWEEN ? AND ? " +
+                "GROUP BY p.Name " +
+                "ORDER BY TotalSold ASC";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, startDate);
+            stmt.setString(2, endDate);
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("Least Popular Products:");
+            while (rs.next()) {
+                System.out.println(rs.getString("Name") + " - " + rs.getInt("TotalSold") + " sold");
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("Database error. Please try again later.");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void getUsersForPromo(Scanner scan, Connection conn) {
+        System.out.println("Enter the number of months without a purchase:");
+        int months = scan.nextInt();
+        scan.nextLine(); // Consume newline
+
+        String query = "SELECT c.FirstName, c.LastName, c.EmailURL, GROUP_CONCAT(DISTINCT p.Name ORDER BY p.Name SEPARATOR ', ') AS FavoriteProducts " +
+                "FROM CUSTOMER c " +
+                "JOIN PRODUCT_TRANSACTION pt ON c.CustomerID = pt.CustomerID " +
+                "JOIN PRODUCT p ON pt.SKU_ID = p.SKU_ID " +
+                "JOIN `TRANSACTION` t ON pt.TransID = t.TransID " +
+                "WHERE t.OrderDate < DATE_SUB(CURDATE(), INTERVAL ? MONTH) " +
+                "GROUP BY c.CustomerID";
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, months);
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("Users for Promotional Emails:");
+            while (rs.next()) {
+                System.out.println(rs.getString("FirstName") + " " + rs.getString("LastName") + " - " + rs.getString("EmailURL") + " - Favorite Products: " + rs.getString("FavoriteProducts"));
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("Database error. Please try again later.");
+            System.out.println(e.getMessage());
+        }
+    }
+
 
     public static double getDouble(Scanner scan, double min, double max) {
         System.out.printf("Enter a double %.2f-%.2f ", min, max);
@@ -235,8 +360,8 @@ public class Main {
 
         //if product not in warehouse, add to inventory table
         String currQty = "SELECT Count FROM INVENTORY " +
-                         "WHERE SKU_ID = " + productFK +
-                        " AND WarehouseName = '" + warehouse + "';";
+                "WHERE SKU_ID = " + productFK +
+                " AND WarehouseName = '" + warehouse + "';";
         //if product in warehouse, update quantity
         try {
             Statement s = conn.createStatement();
@@ -286,18 +411,18 @@ public class Main {
                 hasNext = res.next();
             }
 
-            //get valid fk
+            // get valid fk
             int fk = -1;
             boolean validId = false;
             System.out.println("Which " + table.toLowerCase() + " is this connected to?");
-            while (! validId) {
-                //validate chosen id
+            while (!validId) {
+                // validate chosen id
                 fk = getChoice(scan, min, max);
-                //if the number is not in the db, try again
+                // if the number is not in the db, try again
                 String checkID = String.format("SELECT %s FROM %s WHERE %s = %d", name, table, pk, fk);
                 res = s.executeQuery(checkID);
                 validId = res.next();
-                if (! validId) {
+                if (!validId) {
                     System.out.println("ID not found in database. Please try again.");
                 } else {
                     System.out.println("You selected " + res.getString(name));
@@ -322,13 +447,13 @@ public class Main {
                 System.out.println(res.getString("WarehouseName"));
             }
 
-            //get valid warehouse
+            // get valid warehouse
             System.out.println("Which warehouse would you like to select?");
             String warehouse = scan.nextLine().strip();
             String base = "SELECT * FROM WAREHOUSE WHERE WarehouseName = '";
             String checkQuery = base + warehouse + "';";
             res = s.executeQuery(checkQuery);
-            while (! res.next()) {
+            while (!res.next()) {
                 warehouse = scan.nextLine().strip();
                 checkQuery = base + warehouse + "';";
                 res = s.executeQuery(checkQuery);
