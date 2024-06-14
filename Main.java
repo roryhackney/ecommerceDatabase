@@ -30,6 +30,7 @@ public class Main {
         while (choice != 8) {
             switch (choice) {
                 case 1:
+                    System.out.println("You selected: View Inventory (By Warehouse)");
                     System.out.print(viewInventory(scan, conn));
                     System.out.println("Inventory complete.");
                     break;
@@ -127,7 +128,7 @@ public class Main {
     public static void addProduct(Scanner scan, Connection conn) {
         // print crystal names and ids
         System.out.println("Which crystal is this product made with?");
-        int crystalId = getChoice(scan, 1, 10); // assuming crystal IDs are from 1 to 10
+        int crystalId = getValidFK(conn, scan, "CRYSTAL", "ID", "Name"); // assuming crystal IDs are from 1 to 10
 
         System.out.println("What should this product be named?");
         String name = "";
@@ -174,16 +175,17 @@ public class Main {
 
     public static void updateProductQuantity(Scanner scan, Connection conn) {
         System.out.println("Enter the SKU of the product you want to update:");
-        int sku = getChoice(scan, 1, 10); // assuming SKU IDs are from 1 to 10
-
+        int sku = getValidFK(conn, scan, "PRODUCT", "SKU_ID", "Name");
+        String warehouse = getValidWarehouse(conn, scan);
         System.out.println("Enter the new quantity:");
         int newQuantity = getChoice(scan, 0, 999);
 
         // call the stored procedure to update the inventory amount
         try {
-            CallableStatement stmt = conn.prepareCall("{CALL ModifyInventoryAmount(?, ?)}");
+            CallableStatement stmt = conn.prepareCall("{CALL ModifyInventoryAmount(?, ?, ?)}");
             stmt.setInt(1, sku);
             stmt.setInt(2, newQuantity);
+            stmt.setString(3, warehouse);
             stmt.execute();
             stmt.close();
             System.out.println("Inventory updated successfully.");
@@ -195,7 +197,7 @@ public class Main {
 
     public static void deleteProduct(Scanner scan, Connection conn) {
         System.out.println("Enter the SKU of the product you want to delete:");
-        int sku = getChoice(scan, 1, 10); // assuming SKU IDs are from 1 to 10
+        int sku = getValidFK(conn, scan, "PRODUCT", "SKU_ID", "Name"); // assuming SKU IDs are from 1 to 10
 
         String deleteQuery = "DELETE FROM PRODUCT WHERE SKU_ID = ?";
 
