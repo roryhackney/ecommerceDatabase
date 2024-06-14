@@ -1,6 +1,6 @@
 USE DRAGONS_HOARD_SHOP;
 
-INSERT INTO TAG VALUES
+INSERT INTO TAG (TagName) VALUES
     ("Expensive"),
     ("Cheap"),
     ("Shiny"),
@@ -188,7 +188,7 @@ INSERT INTO REVIEW_TAGS (ReviewID, TagName) VALUES
     (6, "High Quality"),
     (10, "Expensive");
 
-INSERT INTO INVENTORY VALUES
+INSERT INTO INVENTORY (SKU_ID, WarehouseName, Count) VALUES
     (1, "Warehouse A", 32),
     (2, "Warehouse A", 15),
     (3, "Warehouse C", 9),
