@@ -203,11 +203,11 @@ CREATE TABLE REWARDS_MEMBER (
 );
 
 CREATE TABLE INVENTORY (
+	InventoryID INT UNSIGNED PRIMARY KEY,
     SKU_ID INT UNSIGNED,
     WarehouseName VARCHAR(50),
-    CONSTRAINT InventoryPK PRIMARY KEY (SKU_ID, WarehouseName),
     CONSTRAINT InventoryFKSKU FOREIGN KEY (SKU_ID) REFERENCES PRODUCT(SKU_ID)
-	ON UPDATE CASCADE ON DELETE RESTRICT, -- must remove from inventory before deleting product
+	ON UPDATE CASCADE ON DELETE SET NULL, -- if product is deleted, set null (trigger will delete entry)
     CONSTRAINT FOREIGN KEY (WarehouseName) REFERENCES WAREHOUSE(WarehouseName)
 	ON UPDATE CASCADE ON DELETE RESTRICT, -- must remove products from warehouse before deleting/selling warehouse
     Count INT UNSIGNED NOT NULL DEFAULT 0
