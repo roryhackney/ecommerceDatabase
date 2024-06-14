@@ -49,15 +49,15 @@ public class Main {
                     break;
                 case 5:
                     System.out.println("You selected: Get Most Popular Products During Date Range");
-                    // Implement this case as needed
+                    getMostPopularProducts(scan, conn);
                     break;
                 case 6:
                     System.out.println("You selected: Get Least Popular Products During Date Range");
-                    // Implement this case as needed
+                    getLeastPopularProducts(scan, conn);
                     break;
                 case 7:
                     System.out.println("You selected: Get Users for Promo and Their Favorite Products");
-                    // Implement this case as needed
+                    getUsersForPromo(scan, conn);
                     break;
                 default:
                     System.out.println("Invalid choice.");
@@ -262,7 +262,9 @@ public class Main {
 
             System.out.println("Most Popular Products:");
             while (rs.next()) {
-                System.out.println(rs.getString("Name") + " - " + rs.getInt("TotalSold") + " sold");
+                if (rs.getInt("TotalSold") > 5) {
+                    System.out.println(rs.getString("Name") + " - " + rs.getInt("TotalSold") + " sold");
+                }
             }
 
             rs.close();
@@ -295,7 +297,9 @@ public class Main {
 
             System.out.println("Least Popular Products:");
             while (rs.next()) {
-                System.out.println(rs.getString("Name") + " - " + rs.getInt("TotalSold") + " sold");
+                if (rs.getInt("TotalSold") < 5) {
+                    System.out.println(rs.getString("Name") + " - " + rs.getInt("TotalSold") + " sold");
+                }
             }
 
             rs.close();
@@ -313,9 +317,9 @@ public class Main {
 
         String query = "SELECT c.FirstName, c.LastName, c.EmailURL, GROUP_CONCAT(DISTINCT p.Name ORDER BY p.Name SEPARATOR ', ') AS FavoriteProducts " +
                 "FROM CUSTOMER c " +
-                "JOIN PRODUCT_TRANSACTION pt ON c.CustomerID = pt.CustomerID " +
+                "JOIN TRANSACTION t ON c.CustomerID = t.CustomerID " +
+                "JOIN PRODUCT_TRANSACTION pt ON t.TransID = pt.TransID " +
                 "JOIN PRODUCT p ON pt.SKU_ID = p.SKU_ID " +
-                "JOIN `TRANSACTION` t ON pt.TransID = t.TransID " +
                 "WHERE t.OrderDate < DATE_SUB(CURDATE(), INTERVAL ? MONTH) " +
                 "GROUP BY c.CustomerID";
 
