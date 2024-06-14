@@ -180,9 +180,6 @@ public class Main {
         System.out.println("Enter the warehouse where the product is located:");
         String warehouse = getValidWarehouse(conn, scan);
 
-        System.out.println("Enter the new quantity:");
-        int newQuantity = getChoice(scan, 0, 999);
-
         // Check if the product exists in the given warehouse
         String checkQuery = "SELECT Count FROM INVENTORY WHERE SKU_ID = ? AND WarehouseName = ?";
 
@@ -193,17 +190,25 @@ public class Main {
             ResultSet rs = checkStmt.executeQuery();
 
             if (rs.next()) {
-                // If the product exists in the warehouse, update the quantity
-                String updateQuery = "UPDATE INVENTORY SET Count = ? WHERE SKU_ID = ? AND WarehouseName = ?";
-                PreparedStatement updateStmt = conn.prepareStatement(updateQuery);
-                updateStmt.setInt(1, newQuantity);
-                updateStmt.setInt(2, sku);
-                updateStmt.setString(3, warehouse);
-                updateStmt.executeUpdate();
-                updateStmt.close();
-                System.out.println("Inventory updated successfully.");
+                try {
+                    System.out.println("Old quantity: " + rs.getInt("Count"));
+                    System.out.println("Enter the new quantity:");
+                    int newQuantity = getChoice(scan, 0, 999);
+                    CallableStatement stmt = conn.prepareCall("{CALL ModifyInventoryAmount(?, ?, ?)}");
+                    stmt.setInt(1, sku);
+                    stmt.setInt(2, newQuantity);
+                    stmt.setString(3, warehouse);
+                    stmt.executeUpdate();
+                    stmt.close();
+                    System.out.println("Inventory updated successfully.");
+                } catch (SQLException e) {
+                    System.out.println("Database error. Please try again later.");
+                    System.out.println(e.getMessage());
+                }
             } else {
                 // If the product does not exist in the warehouse, insert a new record
+                System.out.println("Enter the new quantity:");
+                int newQuantity = getChoice(scan, 0, 999);
                 String insertQuery = "INSERT INTO INVENTORY (SKU_ID, WarehouseName, Count) VALUES (?, ?, ?)";
                 PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
                 insertStmt.setInt(1, sku);

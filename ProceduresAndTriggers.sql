@@ -34,8 +34,6 @@ CREATE PROCEDURE ModifyInventoryAmount(
     IN p_WarehouseName VARCHAR(50)
 )
 BEGIN
-	INSERT INTO INVENTORY (SKU_ID, WarehouseName, Count) VALUES
-    (p_SKU_ID, p_WarehouseName, p_Count);
     UPDATE INVENTORY
     SET Count = p_Count
     WHERE SKU_ID = p_SKU_ID AND WarehouseName = p_WarehouseName;
