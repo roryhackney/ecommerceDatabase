@@ -26,6 +26,9 @@ We began by analyzing and collecting requirements. As part of this process, we d
 
 ## Implementation
 Once the design was complete, we split up the tasks to write SQL to implement each table, allowing us to make progress on different independent tables at the same time. We also wrote SQL to insert data into each table. Finally, we developed SQL to create procedures and triggers. Once done, we combined our separate files, fixed bugs, and ensured everything worked together and successfully created the database when run in the correct order.
+<img width="1482" height="892" alt="test" src="https://github.com/user-attachments/assets/8c6cbc73-a57b-4f05-94f5-36d753e47890" />
 
 ## Application
 We then created a Java application which calls into the locally running database, using print statements for a menu and gathering user input in the terminal to demonstrate the functionality of the database.
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0a20c1a4-ebe8-43c2-8354-e50d03e5455f" />
+
