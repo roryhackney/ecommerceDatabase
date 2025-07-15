@@ -1,4 +1,4 @@
-# ecommerceDatabase
+# The Dragon's Hoard: Ecommerce SQL Database
 
 ## Running the database
 1. Run the file "ecommerce_createtables.sql"
@@ -10,51 +10,22 @@
    - Set user (root) and password (same as Workbench) at the top of Main (conn)
 
 ## Summary
-Design files and SQL implementation for practice ecommerce database project
+For this project, I worked with [Ken](https://github.com/KenCage1007) to design and implement a relational SQL database for a fictional crystal shop called The Dragon's Hoard in order to develop our database skills. We wanted to track products, current inventory, transactions, reviews for products, and users who signed up for an account on the fictional shop's website.
 
-For this assignment, you will design the DB for an Online Marketplace for a company you choose the name of. You will work on this project as a pair.
-
-The DB should be able to track products, current inventory, transactions, reviews for products, and users who have signed up for an account on our website.
-
-## Design
-
-Go through the Analysis (collect and analyze requirements) and Logical modeling (implement ERD of entities, relationships, and attributes), and normalization phases of your DB design (part of Logical modeling).
-
-In the future, you will need to answer questions from this DB like:
-
+Features:
 * List which products we currently have in inventory
 * Create new products
 * Modify the amount of a particular product that we have in inventory
 * Delete a product from inventory
 * Get a list of the most popular products for a given time range
 * Get a list of the least popular products for a given time range
-* Get a list of users who haven't purchased something in a few months to send promotional emails to
+* Get a list of users who haven't purchased something in a few months to send promotional emails to, this should also include products that these users normally purchase
 
-This should also include products that these users normally purchase
-
-
-Required/Suggested items:
-
-* Have a minimum of 6 entities
-* Crows feet notation must be used
-* Cardinality must be defined, including relationship and attributes minimums and maximums.
-* Unique values should be indicated for Attributes.
-* Include documentation explaining which entities are Strong and which entities are Weak. Do not replace your crows feet notation with the diamond notation. Also, if you have any Supertype and Subtype entities, explain these in the documentation. I would like to see at least one supertype/subtype relationship.
-* Alternative option to documentation is to create a separate ER diagram with the diamond notation and supertype/subtype entities format.
+## Design
+We began by analyzing and collecting requirements. As part of this process, we developed a [glossary](https://github.com/roryhackney/ecommerceDatabase/blob/main/Glossary.pdf) which defined entities, naming conventions, and descriptions of various properties. We then developed an entity relationship [diagram](https://github.com/roryhackney/ecommerceDatabase/blob/main/design.png) (ERD) using Crow's Foot notation to plan our logical model, defining each entity, its properties, and its relationships with other entities (eg, one to many), by each of us designing half of the entities. After normalization, we worked on the final [table diagram](https://github.com/roryhackney/ecommerceDatabase/blob/main/tableDiagram.png) to define precisely how to implement each table in SQL, creating additional join tables for many to many relationships. We also split this work. 
 
 ## Implementation
-You will modify your data model design to normalize your database into Boyce-Codd NF from the Design phase and then implement it. While you are not required to create a new diagram for the database design, it would be helpful if you did, especially with many-to-many relationships.
-
-For each normalized relation write a SQL CREATE TABLE statement. Your tables should implement the PRIMARY KEY and FOREIGN KEY constraints of your normalized design. You should also insert some data into each table. The amount of data should be such that the need for the database is clear. In other words, provide enough examples to demonstrate why a database was required in the first place
-
-Be sure your database can be used to complete the tasks set out in the design phase.
-
-Be careful and consider what constraints may need to be put in place to ensure referential integrity.
+Once the design was complete, we split up the tasks to write SQL to implement each table, allowing us to make progress on different independent tables at the same time. We also wrote SQL to insert data into each table. Finally, we developed SQL to create procedures and triggers. Once done, we combined our separate files, fixed bugs, and ensured everything worked together and successfully created the database when run in the correct order.
 
 ## Application
-Create a Java application which can call into the locally running Online Marketplace DB, as well as create stored procedures/functions and triggers in your database.
-
-Use the Java API to create an application that can access manipulate and query the database you created in the last project.
-Create at least 2 Stored Procedures/Functions and 1 Trigger.
-
-For this, you don't have to make any fancy GUI for this application it can just be text menus. But provide a meaningful interface that is robust and helpful to a person wishing to use this database to query the E-Commerce database.
+We then created a Java application which calls into the locally running database, using print statements for a menu and gathering user input in the terminal to demonstrate the functionality of the database.
